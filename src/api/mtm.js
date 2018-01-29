@@ -28,16 +28,16 @@ export default class MusicAPI {
    */
   static getChart = (date) => {
 
-    let requestUrl = BASE_URL + "/charts/" + date;
-
-    return axios.get(requestUrl)
+    let BILLBOARD_URL = "http://localhost:9006/billboard/charts/" + date + "?filter=song";
+    
+    return axios.get(BILLBOARD_URL)
       .then(function (res) {
 
-        let result = res.data.data;
+        let result = res.data;
         let chart = [];
 
         result.forEach((chartItem) => {
-          chart.push(new ChartPosition(chartItem.rank, chartItem.songId, chartItem['song.name'], chartItem['song.artist']));
+          chart.push(new ChartPosition(chartItem['rank'], chartItem['song_id'], chartItem['song_name'], chartItem['display_artist']));
         });
 
         return chart;
@@ -45,7 +45,7 @@ export default class MusicAPI {
       .catch(function (error) {
         MusicAPI.handleError(error);
       });
-  };
+};
 
   /**
    * Get song information given an id
