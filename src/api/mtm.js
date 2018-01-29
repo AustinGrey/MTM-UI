@@ -51,23 +51,40 @@ export default class MusicAPI {
    * Get song information given an id
    */
   static getSongInfo = (id) => {
-    let requestUrl = BASE_URL + "/songs/" + id;
+    let BILLBOARD_URL = "http://localhost:9006/billboard/music/song/" + id;
 
-    return axios.get(requestUrl)
-      .then(function (response) {
+    return axios.get(BILLBOARD_URL)
+      .then(function (res) {
+        let result = res.data;
 
-        let result = response.data.data;
+        let spotify_url = "http://localhost:9007/spotify/v1/tracks/" + result['song']['spotify_id'];
 
-        let song = new Song(id, result.name, result.artist,
-                    result.albumName, result.albumRelease, result.duration,
-                    result.url, result.image);
+        return axios.get(spotify_url)
+          .then(function (response) {
+            let result2 = response.data;
 
-        return song;
+            let artists = "";
+            result2['artists'].forEach((i) => {
+              artists = artists + ", " + i['name'];
+            });
+
+            let song = new Song(id, result2['name'], ,
+                        "result['albumName']", "result['albumRelease']", "result['duration']",
+                        "result['url']", "result['image']");
+
+            return song;
+
+          })
+          .catch(function (error) {
+            MusicAPI.handleError(error);
+          });
 
       })
       .catch(function (error) {
         MusicAPI.handleError(error);
       });
+
+    
   }
 
   /**
